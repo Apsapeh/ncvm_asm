@@ -14,7 +14,7 @@ crate-type = ["rlib"]
 
 
 [profile.dev]
-panic = "unwind"
+panic = "abort"
 
 [profile.release]
 panic = "abort"

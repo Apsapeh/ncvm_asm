@@ -75,7 +75,7 @@ pub fn main(_argc: i32, _argv: *const *const u8) {
         let src = std::fs::read_to_string("examples/1.asm").unwrap();
         let s = ncvm_asm::compile_asm(src).unwrap();
         //let s = ncvm_asm::compile_asm(String::from("")).unwrap();
-        libc::printf(a.as_ptr() as *const _);
+        //libc::printf(a.as_ptr() as *const _);
     }
     /*let mut stdout = stdout();
     stdout.write(b"Hello, world!\n").unwrap();*/

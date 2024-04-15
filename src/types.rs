@@ -28,7 +28,7 @@ impl Argument {
     }
 }*/
 
-#[derive(Debug)]
+//#[derive(Debug)]
 pub struct Command {
     pub opcode: opcodes::Opcode,
     pub args : Vec<ArgumentType>
