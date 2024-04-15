@@ -1,0 +1,31 @@
+[package]
+name = "ncvm_asm_c_api"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+name = "ncvm_asm"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+lto = true
+codegen-units = 1
+opt-level = "z"
+strip = true
+debug = "none"
+split-debuginfo = "packed"
+debug-assertions = false
+overflow-checks = false
+incremental = false
+
+
+[dependencies]
+ncvm_asm = { path = "../" }
+libc = "0.2.153"
+
