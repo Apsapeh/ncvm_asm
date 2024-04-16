@@ -1,7 +1,7 @@
 
 use crate::opcodes;
 
-#[derive(Debug)]
+#[derive(Clone)]
 pub enum ArgumentType {
     Register(u8),
     /*RegisterU32,
@@ -9,7 +9,17 @@ pub enum ArgumentType {
     RegisterF32,
     RegisterF64,*/
     Memory(String, u64),
-    Immediate(i64),
+    Immediate(u64),
+    Label(String)
+}
+
+impl ArgumentType {
+    pub fn unwrap_register(&self) -> u8 {
+        match self {
+            ArgumentType::Register(v) => *v,
+            _ => panic!("Expected Register")
+        }
+    }
 }
 
 
@@ -29,6 +39,7 @@ impl Argument {
 }*/
 
 //#[derive(Debug)]
+//#[derive(Clone,)]
 pub struct Command {
     pub opcode: opcodes::Opcode,
     pub args : Vec<ArgumentType>
@@ -46,3 +57,18 @@ impl Command {
         self.args.push(arg);
     }
 }
+
+pub struct Block {
+    pub name: String,
+    pub commands: Vec<Command>
+}
+
+
+#[derive(Clone, PartialEq)]
+pub struct Label{
+    pub name: String,
+    pub block_size: u64,
+    pub full_addr: u64,
+    pub used_labels: Vec<String>
+}
+

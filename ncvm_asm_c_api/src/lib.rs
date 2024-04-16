@@ -43,5 +43,5 @@ pub extern fn run() {
     //ncvm_asm::compile_asm(src).unwr();
     //crate::compile_asm(".in(\n00\n)".to_string()).unwrap();
     //crate::compile_asm(".in(\n00\n)".to_string()).unwrap();
-    let a = ncvm_asm::compile_asm("src".to_string()).unwr();
+    ncvm_asm::compile_asm("src".to_string()).unwr();
 }

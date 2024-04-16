@@ -4,6 +4,7 @@ use std::collections::HashMap;
 
 use crate::opcodes;
 use crate::types;
+use crate::types::Block;
 
 
 use types::{
@@ -26,12 +27,12 @@ impl StaticMemoryType {
         }
     }
 
-    pub fn as_str(&self) -> &'static str {
+    /*pub fn as_str(&self) -> &'static str {
         match self {
             StaticMemoryType::Raw     => "raw",
             //StaticMemoryType::String  => ""
         }
-    }
+    }*/
 
     pub fn default() -> StaticMemoryType {
         return StaticMemoryType::Raw;
@@ -41,9 +42,10 @@ impl StaticMemoryType {
 
 pub fn parse(
     src: String
-) -> Result<(HashMap<String, Vec<u8>>, HashMap<String, Vec<Command>>), String> {
+) -> Result<(HashMap<String, Vec<u8>>, Vec<Block>), String> {
     let mut static_memory_var_map = HashMap::new();
-    let mut block_map = HashMap::new();
+    //let mut block_map = HashMap::new();
+    let mut block_vec: Vec<Block> = Vec::new();
 
     // Separate asm by new lines and filter empty strings
     let src_lower = src.to_lowercase();
@@ -76,7 +78,7 @@ pub fn parse(
 
         //let formated_line = formated_line_split_com.clone();
 
-        if (formated_line_split_com.chars().count() == 0) {
+        if formated_line_split_com.chars().count() == 0 {
             continue;
         }
 
@@ -138,12 +140,12 @@ pub fn parse(
         if is_static_memory_block {
             match static_memory_type {
                 StaticMemoryType::Raw => {
-                    let mut data_line = words
+                    let data_line = words
                         .iter()
                         .map(|s|String::from(*s))
                         .collect::<String>();
 
-                    if (data_line.chars().count() % 2 == 1) {
+                    if data_line.chars().count() % 2 == 1 {
                         return Err("Static memory must be an integer number of bytes".to_string());
                     }
 
@@ -165,14 +167,18 @@ pub fn parse(
             block_name = words[0].to_string();
             //println!("Block name: {}", block_name);
 
-            if block_map.contains_key(&block_name) {
+            if block_vec.iter().find(|x| x.name == block_name).is_some() {
                 return Err("Block already defined".to_string());
             }
 
-            block_map.insert(
+            /*block_map.insert(
                 block_name.clone(),
                 vec![]
-            );
+            );*/
+            block_vec.push(Block {
+                name: block_name.clone(),
+                commands: vec![]
+            });
             continue;
         }
 
@@ -195,32 +201,30 @@ pub fn parse(
                             cmd.add_arg(ArgumentType::Memory(String::from(&arg[1..]), 0));
                         }
                         1 => {
-                            let mut split = arg
+                            let split = arg
                                 .split("+")
                                 .collect::<Vec<&str>>();
                             let offset = split[1].parse::<u64>().unwrap();
-                            cmd.add_arg(ArgumentType::Memory(String::from(split[0]), offset));
+                            cmd.add_arg(ArgumentType::Memory(String::from(&split[0][1..]), offset));
                         }
                         _ => {
                             return Err("Invalid memory address".to_string());
                         }
                     }              
                 }
-                else if let a = arg.parse::<i64>() {
-                    match a {
-                        Ok(v) => 
-                            cmd.add_arg(ArgumentType::Immediate(v)),
-                        Err(_) => {
-                            //println!("Error parsing immediate value: {}", line);
-                            //println!("{:?}", words);
-                            return Err(arg.to_string())
-                        }
-                    }
-                    //cmd.add_arg(arg);
-                    //return Err("Unknown argument type".to_string());
+                else if let Ok(a) = arg.parse::<i64>() {
+                    cmd.add_arg(ArgumentType::Immediate(a as u64));
+                }
+                else if let Ok(a) = arg.parse::<u64>() {
+                    cmd.add_arg(ArgumentType::Immediate(a));
+                }
+                else {
+                    cmd.add_arg(ArgumentType::Label(String::from(arg)));
                 }
             }
-            block_map.get_mut(&block_name).unwrap().push(cmd);
+            //block_map.get_mut(&block_name).unwrap().push(cmd);
+            //block_vec.into_iter().find(|x| x.name == block_name).unwrap().commands.push(cmd);
+            block_vec.iter_mut().find(|x| x.name == block_name).unwrap().commands.push(cmd);
             continue;
         }
         else if command.is_none() && !block_name.is_empty() {
@@ -232,6 +236,6 @@ pub fn parse(
     };
     Ok((
         static_memory_var_map,
-        block_map
+        block_vec
     ))
 }

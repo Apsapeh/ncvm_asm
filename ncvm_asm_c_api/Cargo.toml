@@ -10,7 +10,7 @@ crate-type = ["cdylib", "staticlib"]
 name = "ncvm_asm"
 
 [profile.dev]
-panic = "abort"
+panic = "unwind"
 
 [profile.release]
 panic = "abort"

@@ -62,21 +62,20 @@ impl<T> ResultExt<T> for Result<T, String>{
 
 #![no_main]
 
-use std::fs::File;
-use std::io::Write;
-use std::os::unix::io::FromRawFd;
+//use std::fs::File;
+//use std::io::Write;
+//use std::os::unix::io::FromRawFd;
 
 extern crate libc;
 
 #[no_mangle]
 pub fn main(_argc: i32, _argv: *const *const u8) {
-    unsafe {
-        let a = [65];
+    //unsafe {
         let src = std::fs::read_to_string("examples/1.asm").unwrap();
-        let s = ncvm_asm::compile_asm(src).unwrap();
+        ncvm_asm::compile_asm(src).unwrap();
         //let s = ncvm_asm::compile_asm(String::from("")).unwrap();
         //libc::printf(a.as_ptr() as *const _);
-    }
+    //}
     /*let mut stdout = stdout();
     stdout.write(b"Hello, world!\n").unwrap();*/
     //std::io::stdout().write("Hello\n".as_bytes());

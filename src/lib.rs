@@ -1,7 +1,5 @@
 #![no_main]
 
-use std::{collections::{BTreeMap, HashMap}, error::Error, hash::Hash};
-
 mod opcodes;
 mod types;
 mod parser;
