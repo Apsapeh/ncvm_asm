@@ -49,12 +49,12 @@ static COMMANDS: [CommandMapNode; {i}] = [\n'''
     rust_code += "];\n\n"
 
     # Generate address commands array
-    rust_code += f"static ADDRESS_COMMANDS: [Opcode; {len(addr_commands)}] = [\n"
-    for addr_command in addr_commands:
-        rust_code += f"    Opcode::{addr_command['command']},\n"
-    if rust_code[-1] == ",":
-        rust_code = rust_code[:-1]
-    rust_code += "];\n\n"
+    # rust_code += f"static ADDRESS_COMMANDS: [Opcode; {len(addr_commands)}] = [\n"
+    # for addr_command in addr_commands:
+    #     rust_code += f"    Opcode::{addr_command['command']},\n"
+    # if rust_code[-1] == ",":
+    #     rust_code = rust_code[:-1]
+    # rust_code += "];\n\n"
 
     rust_code += '''impl Opcode {
     pub fn from_str(opcode: &str) -> Option<Opcode> {
@@ -66,14 +66,14 @@ static COMMANDS: [CommandMapNode; {i}] = [\n'''
         None
     }
 
-    pub fn is_address_command(&self) -> bool {
+    /*pub fn is_address_command(&self) -> bool {
         for c in &ADDRESS_COMMANDS {
             if *c == *self {
                 return true
             }
         };
         false
-    }
+    }*/
 }'''
 
     open("src/opcodes.rs", "w").write(rust_code)

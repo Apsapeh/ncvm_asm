@@ -1,4 +1,3 @@
-
 use crate::opcodes;
 
 #[derive(Clone)]
@@ -10,18 +9,17 @@ pub enum ArgumentType {
     RegisterF64,*/
     Memory(String, u64),
     Immediate(u64),
-    Label(String)
+    Label(String),
 }
 
 impl ArgumentType {
     pub fn unwrap_register(&self) -> u8 {
         match self {
             ArgumentType::Register(v) => *v,
-            _ => panic!("Expected Register")
+            _ => panic!("Expected Register"),
         }
     }
 }
-
 
 //#[derive(Debug)]
 /*pub struct Argument {
@@ -42,14 +40,14 @@ impl Argument {
 //#[derive(Clone,)]
 pub struct Command {
     pub opcode: opcodes::Opcode,
-    pub args : Vec<ArgumentType>
+    pub args: Vec<ArgumentType>,
 }
 
 impl Command {
     pub fn new(opcode: opcodes::Opcode) -> Command {
         Command {
             opcode,
-            args: vec![]
+            args: vec![],
         }
     }
 
@@ -60,15 +58,13 @@ impl Command {
 
 pub struct Block {
     pub name: String,
-    pub commands: Vec<Command>
+    pub commands: Vec<Command>,
 }
 
-
 #[derive(Clone, PartialEq)]
-pub struct Label{
+pub struct Label {
     pub name: String,
     pub block_size: u64,
     pub full_addr: u64,
-    pub used_labels: Vec<String>
+    pub used_labels: Vec<String>,
 }
-

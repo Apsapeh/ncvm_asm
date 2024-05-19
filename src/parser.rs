@@ -14,8 +14,10 @@ use types::{
 };
 
 
+#[derive(PartialEq)]
 enum StaticMemoryType {
     Raw,
+    Text
     //String
 }
 
@@ -23,6 +25,7 @@ impl StaticMemoryType {
     pub fn from_str(s: &str) -> Option<StaticMemoryType> {
         match s {
             "raw" => Some(StaticMemoryType::Raw),
+            "text" => Some(StaticMemoryType::Text),
             _ => None
         }
     }
@@ -48,15 +51,16 @@ pub fn parse(
     let mut block_vec: Vec<Block> = Vec::new();
 
     // Separate asm by new lines and filter empty strings
-    let src_lower = src.to_lowercase();
+    let src_lower = src;//.to_lowercase();
     let lines = src_lower
         .split("\n")
-        .filter(|s| s.len() > 0)
-        .map(|s| s.trim())
+        //.filter(|s| s.len() > 0)
+        .map(|s| s/*.trim()*/)
         .collect::<Vec<&str>>();
 
-    let mut is_static_memory_block = false;
-    let mut static_memory_block_name = String::new();
+    let mut is_static_memory_block      = false;
+    let mut is_text_static_memory_block = false;    
+    let mut static_memory_block_name  = String::new();
     let mut static_memory_type = StaticMemoryType::default();
     let mut block_name = String::new();
 
@@ -78,7 +82,8 @@ pub fn parse(
 
         //let formated_line = formated_line_split_com.clone();
 
-        if formated_line_split_com.chars().count() == 0 {
+        if formated_line_split_com.chars().count() == 0 
+           && !is_static_memory_block {
             continue;
         }
 
@@ -92,7 +97,7 @@ pub fn parse(
 
 
         // Static memory block definition
-        if words.len() >= 2 && words[0] == "." {
+        if words.len() >= 2 && words[0] == "." && !is_text_static_memory_block {
             is_static_memory_block = true;
             static_memory_block_name = words[1].to_string();
 
@@ -104,7 +109,7 @@ pub fn parse(
                 static_memory_block_name.clone(),
                 vec![]
             );
-            #[cfg(debug_assertions)]
+            //#[cfg(debug_assertions)]
             //println!("Static memory definition found: {}", words[1]);
 
             if words.len() == 3 && words[2] == "(" {
@@ -116,6 +121,10 @@ pub fn parse(
                     Some(t) => static_memory_type = t,
                     None => return Err("Unknown static memory block type".to_string())
                 }
+
+                if static_memory_type == StaticMemoryType::Text {
+                    is_text_static_memory_block = true;
+                }
             }
             else {
                 return Err("Unexplained line".to_string());
@@ -126,7 +135,16 @@ pub fn parse(
         // End of static memory block
         if words.len() == 1 && words[0] == ")" {
             if is_static_memory_block {
+                if is_text_static_memory_block {
+                    //Remove last \n
+                    if static_memory_var_map.get(&static_memory_block_name).unwrap().len() != 0 {
+                        static_memory_var_map.get_mut(&static_memory_block_name).unwrap().pop();
+                    }
+                    static_memory_var_map.get_mut(&static_memory_block_name).unwrap().push(0);
+                }
+
                 is_static_memory_block = false;
+                is_text_static_memory_block = false;
                 static_memory_type = StaticMemoryType::default();
                 static_memory_block_name.clear();
             }
@@ -155,6 +173,23 @@ pub fn parse(
                         static_memory_var_map.get_mut(&static_memory_block_name).unwrap().push(u8::from_str_radix(chunk, 16).unwrap());
                         cur = rest;
                     }
+                }
+                StaticMemoryType::Text => {
+                    let mut a = line
+                        .replace("\\a", "\x07")
+                        .replace("\\b", "\x08")
+                        .replace("\\e", "\x1B")
+                        .replace("\\f", "\x0C")
+                        .replace("\\n", "\x0A")
+                        .replace("\\r", "\x0D")
+                        .replace("\\t", "\x09")
+                        .replace("\\v", "\x0B")
+                        .replace("\\\\", "\\")
+                        .replace("\\?", "\x3F");
+
+                    a += "\n";
+                        
+                    static_memory_var_map.get_mut(&static_memory_block_name).unwrap().extend_from_slice(a.as_bytes());
                 }
             }
             continue;
@@ -191,7 +226,7 @@ pub fn parse(
             let mut cmd = Command::new(command.unwrap());
             for i in 1..words.len() {
                 let arg = words[i];
-                if arg.starts_with("r") {
+                if arg.starts_with("r") || arg.starts_with("R") {
                     let index = arg[1..].parse::<u8>().unwrap();
                     cmd.add_arg(ArgumentType::Register(index));
                 }

@@ -119,21 +119,22 @@ pub enum Opcode {
     DJEL = 115,
     DJMG = 116,
     DJEG = 117,
-    L_CALL = 118,
+    CALL = 118,
+    LIBCALL = 119,
 }
 
 struct CommandMapNode {
     key: &'static str,
-    val: Opcode
+    val: Opcode,
 }
 
 impl CommandMapNode {
     pub const fn new(key: &'static str, val: Opcode) -> CommandMapNode {
-        CommandMapNode {key, val}
+        CommandMapNode { key, val }
     }
 }
 
-static COMMANDS: [CommandMapNode; 119] = [
+static COMMANDS: [CommandMapNode; 120] = [
     CommandMapNode::new("nop", Opcode::NOP),
     CommandMapNode::new("stop", Opcode::STOP),
     CommandMapNode::new("ret", Opcode::RET),
@@ -252,80 +253,23 @@ static COMMANDS: [CommandMapNode; 119] = [
     CommandMapNode::new("djel", Opcode::DJEL),
     CommandMapNode::new("djmg", Opcode::DJMG),
     CommandMapNode::new("djeg", Opcode::DJEG),
-    CommandMapNode::new("l_call", Opcode::L_CALL),
+    CommandMapNode::new("call", Opcode::CALL),
+    CommandMapNode::new("libcall", Opcode::LIBCALL),
 ];
-
-/*static ADDRESS_COMMANDS: [Opcode; 54] = [
-    Opcode::IRSA,
-    Opcode::ILSA,
-    Opcode::LRSA,
-    Opcode::LLSA,
-    Opcode::ISMLD,
-    Opcode::ISMST,
-    Opcode::LSMLD,
-    Opcode::LSMST,
-    Opcode::FSMLD,
-    Opcode::FSMST,
-    Opcode::DSMLD,
-    Opcode::DSMST,
-    Opcode::POPA,
-    Opcode::ISTLD,
-    Opcode::ISTST,
-    Opcode::LSTLD,
-    Opcode::LSTST,
-    Opcode::FSTLD,
-    Opcode::FSTST,
-    Opcode::DSTLD,
-    Opcode::DSTST,
-    Opcode::JMP,
-    Opcode::IJEZ,
-    Opcode::IJNZ,
-    Opcode::IJEQ,
-    Opcode::IJNQ,
-    Opcode::IJML,
-    Opcode::IJEL,
-    Opcode::IJMG,
-    Opcode::IJEG,
-    Opcode::LJEZ,
-    Opcode::LJNZ,
-    Opcode::LJEQ,
-    Opcode::LJNQ,
-    Opcode::LJML,
-    Opcode::LJEL,
-    Opcode::LJMG,
-    Opcode::LJEG,
-    Opcode::FJEZ,
-    Opcode::FJNZ,
-    Opcode::FJEQ,
-    Opcode::FJNQ,
-    Opcode::FJML,
-    Opcode::FJEL,
-    Opcode::FJMG,
-    Opcode::FJEG,
-    Opcode::DJEZ,
-    Opcode::DJNZ,
-    Opcode::DJEQ,
-    Opcode::DJNQ,
-    Opcode::DJML,
-    Opcode::DJEL,
-    Opcode::DJMG,
-    Opcode::DJEG,
-];*/
 
 impl Opcode {
     pub fn from_str(opcode: &str) -> Option<Opcode> {
         for c in &COMMANDS {
             if c.key == opcode {
-                return Some(c.val)
+                return Some(c.val);
             }
-        };
+        }
         None
     }
 
     /*pub fn is_address_command(&self) -> bool {
         for c in &ADDRESS_COMMANDS {
-            //let a = *c as u8;
-            if *c as u8 == *self as u8{
+            if *c == *self {
                 return true
             }
         };
