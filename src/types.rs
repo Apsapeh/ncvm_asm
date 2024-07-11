@@ -1,6 +1,6 @@
 use crate::opcodes;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum ArgumentType {
     Register(u8),
     /*RegisterU32,
@@ -36,7 +36,7 @@ impl Argument {
     }
 }*/
 
-//#[derive(Debug)]
+#[derive(Debug)]
 //#[derive(Clone,)]
 pub struct Command {
     pub opcode: opcodes::Opcode,

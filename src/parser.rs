@@ -17,7 +17,9 @@ use types::{
 #[derive(PartialEq)]
 enum StaticMemoryType {
     Raw,
-    Text
+    Text,
+    Float,
+    Double,
     //String
 }
 
@@ -26,6 +28,8 @@ impl StaticMemoryType {
         match s {
             "raw" => Some(StaticMemoryType::Raw),
             "text" => Some(StaticMemoryType::Text),
+            "float" | "f32" => Some(StaticMemoryType::Float),
+            "double" | "f64" => Some(StaticMemoryType::Double),
             _ => None
         }
     }
@@ -65,6 +69,10 @@ pub fn parse(
     let mut block_name = String::new();
 
     for line in lines {
+        if line.trim().starts_with(";") || line.trim().is_empty() {
+            continue;
+        }
+
         let formated_line_split_com = line
             .replace(".", " . ")
             .replace("<", " < ")
@@ -190,6 +198,14 @@ pub fn parse(
                     a += "\n";
                         
                     static_memory_var_map.get_mut(&static_memory_block_name).unwrap().extend_from_slice(a.as_bytes());
+                }
+                StaticMemoryType::Float => {
+                    let num = line.trim().parse::<f32>().unwrap();
+                    static_memory_var_map.get_mut(&static_memory_block_name).unwrap().extend_from_slice(&num.to_le_bytes());
+                }
+                StaticMemoryType::Double => {
+                    let num = line.trim().parse::<f64>().unwrap();
+                    static_memory_var_map.get_mut(&static_memory_block_name).unwrap().extend_from_slice(&num.to_le_bytes());
                 }
             }
             continue;

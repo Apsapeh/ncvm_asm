@@ -86,7 +86,7 @@ pub fn precompile(
                         }
                         else if command.opcode == Opcode::LSR {
                             split_on_bytes(
-                                v.clone(), Opcode::LSR, 0,
+                                v.clone(), Opcode::LSR, command.args[0].unwrap_register(),
                                 Opcode::LLSI, &mut compiled_blocks, 4
                             );
                             skip_push = true;
@@ -190,9 +190,9 @@ pub fn precompile(
         .collect::<Vec<Vec<u8>>>();
 
     // Print final commands
-    /*for (i, cmd) in final_commands.iter().enumerate() {
+    for (i, cmd) in final_commands.iter().enumerate() {
         println!("{i}: {:?}", cmd);
-    }*/
+    }
 
     (compiled_lib_functions, compiled_static_memory, final_commands)
 }
@@ -224,6 +224,7 @@ fn split_on_bytes(
         compiled_blocks.push(c);
         if i != 0 {
             let mut load_command = Command::new(shift_opcode);
+            load_command.add_arg(ArgumentType::Register(sr_number));
             load_command.add_arg(ArgumentType::Register(sr_number));
             load_command.add_arg(ArgumentType::Register(16));
             compiled_blocks.push(load_command);
