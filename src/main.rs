@@ -53,7 +53,7 @@ ncvm_asm::compile_asm(src).unwr();*/
 
 use std::io::Write;
 
-extern crate libc;
+//extern crate libc;
 
 trait ResultExt <T> {
     fn unwr(self) -> T;
@@ -65,7 +65,8 @@ impl<T> ResultExt<T> for Result<T, String>{
             Ok(v) => v,
             Err(e) => {
                 //std::io::stdout().write(e.to_string().as_bytes());
-                println!("{}", e.to_string());
+                //println!("{}", e.to_string());
+                
                 std::process::exit(1);
             }
         }
@@ -77,7 +78,7 @@ pub fn main(_argc: i32, _argv: *const *const u8) {
 //fn main() {
     
     if _argc < 2 {
-        println!("Usage: ncvm_asm <file>");
+        //println!("Usage: ncvm_asm <file>");
         std::process::exit(1);
     }
     let filename = unsafe {

@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq)]
 #[repr(u8)]
 pub enum Opcode {
     NOP = 0,

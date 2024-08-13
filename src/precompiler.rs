@@ -190,9 +190,9 @@ pub fn precompile(
         .collect::<Vec<Vec<u8>>>();
 
     // Print final commands
-    for (i, cmd) in final_commands.iter().enumerate() {
+    /*for (i, cmd) in final_commands.iter().enumerate() {
         println!("{i}: {:?}", cmd);
-    }
+    }*/
 
     (compiled_lib_functions, compiled_static_memory, final_commands)
 }
