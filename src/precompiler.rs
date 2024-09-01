@@ -7,7 +7,7 @@ use crate::opcodes::Opcode;
 pub fn precompile(
     sm_map: HashMap<String, Vec<u8>>,
     block_map: Vec<Block>,
-) -> (Vec<Vec<u8>>, Vec<u8>, Vec<Command>) {
+) -> (Vec<Vec<u8>>, Vec<u8>, Vec<Command>, Vec<Label>) {
     let mut lib_functions = vec![];
 
     let mut static_memory_var_map = HashMap::with_capacity(sm_map.len());
@@ -139,6 +139,7 @@ pub fn precompile(
         let end_block_addr = compiled_blocks.len() as u64;
         labels.push(Label {
             name: block.name.clone(),
+            is_public: block.is_public,
             block_size: end_block_addr - start_block_addr,
             full_addr: 0,
             used_labels: used_labels
@@ -180,6 +181,9 @@ pub fn precompile(
         }
         final_commands.push(new_command);
     }
+    
+    let public_labels = labels.into_iter().filter(|x| x.is_public).collect::<Vec<Label>>();
+    println!("{:?}", public_labels);
 
     let compiled_lib_functions = lib_functions.into_iter()
         .map(|x| {
@@ -194,7 +198,7 @@ pub fn precompile(
         println!("{i}: {:?}", cmd);
     }*/
 
-    (compiled_lib_functions, compiled_static_memory, final_commands)
+    (compiled_lib_functions, compiled_static_memory, final_commands, public_labels)
 }
 
 

@@ -2,7 +2,7 @@
     1.0
 )
 
-main:
+pub main:
     ISR R0 100000002   ; Количество итераций
     ISR R1 1
     ITOD R0 R1          ; var pi = 1.0
@@ -28,3 +28,7 @@ main:
     ;LIBCALL print_long
     LIBCALL print_pi
     STOP                ; Остановка программы
+    
+pub fn:
+    ;IOUT R0
+    RET

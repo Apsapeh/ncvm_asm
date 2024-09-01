@@ -65,7 +65,7 @@ impl<T> ResultExt<T> for Result<T, String>{
             Ok(v) => v,
             Err(e) => {
                 //std::io::stdout().write(e.to_string().as_bytes());
-                //println!("{}", e.to_string());
+                println!("{}", e.to_string());
                 
                 std::process::exit(1);
             }

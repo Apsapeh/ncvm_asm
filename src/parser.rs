@@ -214,8 +214,11 @@ pub fn parse(
 
 
         // Block definition
-        if words.len() == 2 && words[1] == ":" {
+        if (words.len() == 2 && words[1] == ":") || (words.len() == 3 && words[0] == "pub" && words[2] == ":") {
             block_name = words[0].to_string();
+            if words.len() == 3 {
+                block_name = words[1].to_string();
+            }
             //println!("Block name: {}", block_name);
 
             if block_vec.iter().find(|x| x.name == block_name).is_some() {
@@ -228,7 +231,8 @@ pub fn parse(
             );*/
             block_vec.push(Block {
                 name: block_name.clone(),
-                commands: vec![]
+                commands: vec![],
+                is_public: words.len() == 3 || block_name == "main"
             });
             continue;
         }

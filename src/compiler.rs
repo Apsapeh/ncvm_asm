@@ -1,16 +1,17 @@
-use crate::types::{ArgumentType, Command};
+use crate::types::{ArgumentType, Command, Label};
 
 pub fn compile(
     lib_functions: Vec<Vec<u8>>,
     mut compiled_static_mem: Vec<u8>,
     compiled_commands: Vec<Command>,
+    public_labels: Vec<Label>,
 ) -> Vec<u8> {
     let mut result = Vec::with_capacity(
         compiled_static_mem.len() + compiled_commands.len() * 4
     );
 
     // Version
-    let version = 0u32;
+    let version = 1u32;
     result.extend_from_slice(&version.to_le_bytes());
 
     // Setings
@@ -24,6 +25,8 @@ pub fn compile(
     result.extend_from_slice(&call_stack_size.to_le_bytes()); // call stack size
 
     // Blocks info
+    let public_labels_count = public_labels.len() as u64;
+    result.extend_from_slice(&public_labels_count.to_le_bytes()); // public labels count
     let lib_functions_count = lib_functions.len() as u64;
     result.extend_from_slice(&lib_functions_count.to_le_bytes()); // lib functions count
     let lib_functions_size = lib_functions.iter().map(|v| v.len()).sum::<usize>() as u64;
@@ -32,6 +35,21 @@ pub fn compile(
     result.extend_from_slice(&static_mem_size.to_le_bytes()); // static memory index
     let block_size = compiled_commands.len() as u64;
     result.extend_from_slice(&block_size.to_le_bytes()); // block index
+    
+    // Public labels
+    for label in public_labels {
+        let mut byte_name = label.name.into_bytes();
+        /*if byte_name[byte_name.len() - 1] != 0 {
+            byte_name.push(0);
+        }*/
+        byte_name.push(0);
+        if byte_name.len() > 255 {
+            panic!("Label name is too long");
+        }
+        result.push(byte_name.len() as u8);
+        result.extend_from_slice(&byte_name);
+        result.extend_from_slice(&label.full_addr.to_le_bytes());
+    }
 
     // Lib functions
     for lib_function in lib_functions {

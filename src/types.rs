@@ -60,11 +60,13 @@ impl Command {
 pub struct Block {
     pub name: String,
     pub commands: Vec<Command>,
+    pub is_public: bool,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct Label {
     pub name: String,
+    pub is_public: bool,
     pub block_size: u64,
     pub full_addr: u64,
     pub used_labels: Vec<String>,
